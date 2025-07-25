@@ -1,6 +1,16 @@
+<script setup lang="ts">
+</script>
+
 <template>
   <div>
     <NuxtRouteAnnouncer />
-    <h3 class="text-4xl text-red-500">hello</h3>
+    <img
+      src="https://foodtopia-backend.fly.dev/images/flags/albania.svg"
+      alt="Albania Flag"
+    />
+    <img
+      src="https://foodtopia-backend.fly.dev/images/recipes/low_calorie_pizza.jpg"
+      alt="pizza"
+    />
   </div>
 </template>
