@@ -15,7 +15,6 @@ export const useAuthStore = defineStore("auth", () => {
   ) {
     const url = `${baseUrl}/api/account/login`;
 
-    // Send request
     const { data, error } = await useFetch<AuthResponse>(url, {
       method: "POST",
       body: payload,
@@ -23,10 +22,10 @@ export const useAuthStore = defineStore("auth", () => {
     });
 
     if (error.value) {
-      console.error("Login error response data:", error.value);
+      //   console.error("Login value response data:", error.value.data);
       throw createError({
         statusCode: error.value.statusCode || 400,
-        statusMessage: error.value.data?.message || "Login failed.",
+        statusMessage: error.value.data || "Login failed.",
         data: error.value.data,
       });
     }
@@ -46,7 +45,14 @@ export const useAuthStore = defineStore("auth", () => {
     localStorage.setItem("authToken", token.value);
     navigateTo(redirectTo ?? "/");
   }
-  return { user, token, login };
+
+  function logout() {
+    user.value = null;
+    token.value = null;
+    localStorage.removeItem("authToken");
+    navigateTo("/login");
+  }
+  return { user, token, login, logout };
 });
 //   async function login(
 //       payload: { username: string; password: string },
