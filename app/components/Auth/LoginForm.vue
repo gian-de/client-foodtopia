@@ -1,27 +1,36 @@
 <script setup lang="ts">
-import { reactive } from "vue";
+import { reactive, Text } from "vue";
+
 import { useAuthStore } from "@/stores/auth";
+
+import EyeIcon from "@/components/svgs/EyeIcon.vue";
+import EyeIconSlash from "@/components/svgs/EyeIconSlash.vue";
 
 const auth = useAuthStore();
 
 const form = reactive({ username: "", password: "" });
 const isLoading = ref(false);
 const errorMessage = ref("");
+const isPasswordHidden = ref(true);
 
 async function onSubmitLoginForm() {
   try {
     isLoading.value = true;
     errorMessage.value = "";
-    console.log("FORM:", form);
     await auth.login(
       { username: form.username, password: form.password },
       form.username
     );
   } catch (err: any) {
-    console.log(err, "inside login form component");
+    errorMessage.value = err.data || err.statusMessage || "Login failed.";
   } finally {
     isLoading.value = false;
   }
+}
+
+async function showPassword() {
+  isPasswordHidden.value = !isPasswordHidden.value;
+  return;
 }
 </script>
 
@@ -31,16 +40,6 @@ async function onSubmitLoginForm() {
       @submit.prevent="onSubmitLoginForm"
       class="flex flex-col p-6 space-y-4 rounded-md shadow-md bg-gray-200/80"
     >
-      <div
-        v-if="errorMessage"
-        class="p-3 text-red-600 bg-red-100 border border-red-300 rounded-md"
-      >
-        {{ errorMessage }}
-      </div>
-      <div v-if="auth.user" class="p-4 mt-4 bg-green-300 rounded-md">
-        <p>Logged in as: {{ auth.user.username }}</p>
-        <p>Email: {{ auth.user.email }}</p>
-      </div>
       <div class="flex flex-col items-start justify-center w-full space-y-2">
         <label class="text-3xl" for="username">Username:</label>
         <input
@@ -63,16 +62,31 @@ async function onSubmitLoginForm() {
             >Forgot password?</NuxtLink
           >
         </div>
-        <input
-          v-model="form.password"
-          :disabled="isLoading"
-          id="password"
-          name="password"
-          type="password"
-          required
-          class="flex items-center w-4/5 h-10 pl-2 text-2xl border rounded-md border-slate-800 bg-slate-50 focus:outline-green-600"
-          placeholder="************"
-        />
+        <div class="relative flex items-center w-4/5 h-10">
+          <div
+            @click="showPassword"
+            class="absolute px-2 cursor-pointer right-2"
+          >
+            <component v-if="isPasswordHidden"><EyeIcon /></component>
+            <component v-else><EyeIconSlash /></component>
+          </div>
+          <input
+            v-model="form.password"
+            :disabled="isLoading"
+            id="password"
+            name="password"
+            :type="isPasswordHidden ? 'password' : 'text'"
+            required
+            class="w-full pl-2 text-2xl border rounded-md border-slate-800 bg-slate-50 focus:outline-green-600"
+            placeholder="************"
+          />
+        </div>
+      </div>
+      <div
+        v-if="errorMessage"
+        class="p-3 text-red-600 bg-red-100 border border-red-300 rounded-md"
+      >
+        {{ errorMessage }}
       </div>
       <div class="flex items-center justify-between">
         <span>
@@ -87,7 +101,7 @@ async function onSubmitLoginForm() {
         <button
           :disabled="isLoading"
           type="submit"
-          class="px-4 py-1 text-lg bg-green-600 rounded-md cursor-pointer text-slate-50 hover:bg-green-700"
+          class="px-4 py-1 text-lg bg-green-600 rounded-md cursor-pointer text-slate-50 hover:bg-green-700 disabled:cursor-not-allowed disabled:bg-slate-500/70 disabled:text-black"
         >
           {{ isLoading ? "Logging in..." : "Login" }}
         </button>

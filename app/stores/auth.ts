@@ -14,74 +14,28 @@ export const useAuthStore = defineStore("auth", () => {
     redirectTo?: string
   ) {
     const url = `${baseUrl}/api/account/login`;
-
-    const { data, error } = await useFetch<AuthResponse>(url, {
-      method: "POST",
-      body: payload,
-      headers: { "Content-Type": "application/json" },
-    });
-
-    if (error.value) {
-      //   console.error("Login value response data:", error.value.data);
-      throw createError({
-        statusCode: error.value.statusCode || 400,
-        statusMessage: error.value.data || "Login failed.",
-        data: error.value.data,
+    try {
+      const data = await $fetch<AuthResponse>(url, {
+        method: "POST",
+        body: payload,
+        headers: {
+          "Content-Type": "application/json",
+        },
       });
+
+      token.value = data.jwtToken;
+      user.value = {
+        username: data.userName,
+        email: data.email,
+      };
+
+      localStorage.setItem("authToken", token.value);
+      await navigateTo(redirectTo ?? "/");
+    } catch (err: any) {
+      const statusCode = err.status ?? 500;
+      const statusMessage = err.message || "Login failed";
+      throw createError({ statusCode, statusMessage, data: err.data });
     }
-
-    if (!data.value) {
-      throw createError({
-        statusCode: 500,
-        statusMessage: "No response from the server.",
-      });
-    }
-
-    token.value = data.value.jwtToken;
-    user.value = {
-      username: data.value.userName,
-      email: data.value.email,
-    };
-    localStorage.setItem("authToken", token.value);
-    navigateTo(redirectTo ?? "/");
   }
-
-  function logout() {
-    user.value = null;
-    token.value = null;
-    localStorage.removeItem("authToken");
-    navigateTo("/login");
-  }
-  return { user, token, login, logout };
+  return { user, token, login };
 });
-//   async function login(
-//       payload: { username: string; password: string },
-//       redirectTo?: string
-//     ) {
-//         try {
-//             const url = `${baseUrl}/api/account/login`;
-//             const response = await $fetch<AuthResponse>(url, {
-//                 method: "POST",
-//                 body: JSON.stringify(payload),
-//                 headers: {
-//                     "Content-Type": "application/json",
-//                 },
-//             });
-
-//             token.value = response.jwtToken;
-//             user.value = {
-//                 username: response.userName,
-//                 email: response.email,
-//             };
-
-//             localStorage.setItem("authToken", token.value);
-//             await navigateTo(redirectTo ?? "/");
-//             return response;
-//         } catch (err: any) {
-//             const statusCode = err.response?.status ?? 500;
-//             const statusMessage =
-//             err.response?.data?.message || err.message || "Login failed";
-//             throw createError({ statusCode, statusMessage });
-//         }
-//     }
-//     return { login };
