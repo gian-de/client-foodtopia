@@ -5,6 +5,14 @@ const navAuthLinks = [
   { id: 1, name: "register", to: "/register" },
   { id: 2, name: "login", to: "/login" },
 ];
+
+const auth = useAuthStore();
+const { user, isAuthenticated } = storeToRefs(auth);
+
+function onClickSignOut() {
+  return auth.logout;
+  navigateTo("/");
+}
 </script>
 
 <template>
@@ -13,15 +21,28 @@ const navAuthLinks = [
       <NuxtLink to="/" class="text-4xl text-green-500 uppercase cursor-pointer"
         >Foodtopia</NuxtLink
       >
-      <div class="flex items-center space-x-4 text-xl text-slate-50">
+      <div
+        v-if="isAuthenticated"
+        class="flex items-center space-x-4 text-xl text-slate-50"
+      >
         <NuxtLink
-          v-for="link in navAuthLinks"
-          :to="link.to"
+          @click="onClickSignOut"
           class="px-3 py-1 capitalize rounded-md cursor-pointer"
           active-class="text-black bg-gray-200"
         >
-          {{ link.name }}
+          Sign out
         </NuxtLink>
+        <div></div>
+        <div class="flex items-center space-x-4 text-xl text-slate-50">
+          <NuxtLink
+            v-for="link in navAuthLinks"
+            :to="link.to"
+            class="px-3 py-1 capitalize rounded-md cursor-pointer"
+            active-class="text-black bg-gray-200"
+          >
+            {{ link.name }}
+          </NuxtLink>
+        </div>
       </div>
     </div>
   </nav>
