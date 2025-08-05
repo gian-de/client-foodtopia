@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { reactive, Text } from "vue";
+import { reactive, ref } from "vue";
 
 import { useAuthStore } from "@/stores/auth";
 
@@ -67,8 +67,10 @@ async function showPassword() {
             @click="showPassword"
             class="absolute px-2 cursor-pointer right-2"
           >
-            <component v-if="isPasswordHidden"><EyeIcon /></component>
-            <component v-else><EyeIconSlash /></component>
+            <EyeIcon v-if="isPasswordHidden" />
+            <EyeIconSlash v-else />
+            <!-- <component v-if="isPasswordHidden"><EyeIcon /></component>
+            <component v-else><EyeIconSlash /></component> -->
           </div>
           <input
             v-model="form.password"
