@@ -17,12 +17,25 @@ async function onSubmitLoginForm() {
   try {
     isLoading.value = true;
     errorMessage.value = "";
+
+    if (!form.username.trim()) throw new Error("Username is required.");
+    if (form.username.length < 3)
+      throw new Error("Username must be at least 3 characters.");
+    if (form.username.length > 50)
+      throw new Error("Username cannot be more than 50 characters.");
+    if (!form.password.trim()) throw new Error("Password is required.");
+    if (form.password.length < 6)
+      throw new Error("Password must be at least 6 characters.");
+    if (form.password.length > 100)
+      throw new Error("Password cannot be more than 100 characters.");
+
     await auth.login(
       { username: form.username, password: form.password },
       form.username
     );
   } catch (err: any) {
-    errorMessage.value = err.data || err.statusMessage || "Login failed.";
+    errorMessage.value =
+      err.data || err.message || err.statusMessage || "Login failed."; // Ordering is important obviously!
   } finally {
     isLoading.value = false;
   }
@@ -69,8 +82,6 @@ async function showPassword() {
           >
             <EyeIcon v-if="isPasswordHidden" />
             <EyeIconSlash v-else />
-            <!-- <component v-if="isPasswordHidden"><EyeIcon /></component>
-            <component v-else><EyeIconSlash /></component> -->
           </div>
           <input
             v-model="form.password"

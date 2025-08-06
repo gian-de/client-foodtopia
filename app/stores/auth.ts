@@ -61,5 +61,58 @@ export const useAuthStore = defineStore("auth", () => {
     clearAuth();
     navigateTo("/");
   }
-  return { user, token, isAuthenticated, login, clearAuth, logout };
+
+  async function register(
+    payload: { email: string; username: string; password: string },
+    redirectTo?: string
+  ) {
+    console.log("=== REGISTER FUNCTION CALLED ===");
+    console.log("payload:", payload);
+
+    const url = `${baseUrl}/api/account/register`;
+
+    try {
+      const data = await $fetch(url, {
+        method: "POST",
+        body: payload,
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+      console.log("POST method made", payload.email, payload.username);
+      navigateTo(redirectTo);
+    } catch (err: any) {
+      console.log("=== CAUGHT ERROR IN AUTH STORE ===");
+      console.log("err:", err);
+      console.log("err.data:", err.data);
+      console.log("========================");
+
+      let errorMessage = "";
+
+      //   const errorMessage = Array.isArray(err.data)
+      //     ? err.data.map((e: any) => e.description || e.message).join(" ")
+      //     : err.data?.message || err.data?.description || "Registration failed.";
+
+      //   throw new Error(errorMessage);
+      if (Array.isArray(err.data)) {
+        console.log("It's an array");
+        errorMessage = err.data
+          .map((e: any) => e.description || e.message)
+          .join(" ");
+      } else if (err.data?.message) {
+        console.log("It has a message property");
+        errorMessage = err.data.message;
+      } else if (err.data?.description) {
+        console.log("It has a description property");
+        errorMessage = err.data.description;
+      } else {
+        console.log("Using fallback");
+        errorMessage = err.message || "Registration failed.";
+      }
+
+      console.log("Final error message:", errorMessage);
+      throw new Error(errorMessage);
+    }
+  }
+  return { user, token, isAuthenticated, login, clearAuth, logout, register };
 });
