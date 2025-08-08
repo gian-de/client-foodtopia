@@ -64,10 +64,6 @@ async function onSubmitRegisterInfo() {
       "confirm-email"
     );
   } catch (err: any) {
-    console.log("=== CAUGHT ERROR IN COMPONENT ===");
-    console.log("err:", err);
-    console.log("err.message:", err.message);
-    console.log("err.data:", err.data);
     errorMessage.value = err.message || "Attempt to register failed.";
   } finally {
     isLoading.value = false;

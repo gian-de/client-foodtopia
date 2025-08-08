@@ -46,6 +46,24 @@ export const useAuthStore = defineStore("auth", () => {
     }
   }
 
+  async function autoLogin(
+    userData: { token: string; username: string; email: string },
+    redirectTo?: string
+  ) {
+    token.value = userData.token;
+    user.value = {
+      username: userData.username,
+      email: userData.email,
+    };
+    isAuthenticated.value = true;
+
+    if (import.meta.client) {
+      localStorage.setItem("authUser", JSON.stringify(user.value));
+      localStorage.setItem("authToken", token.value);
+    }
+    await navigateTo(redirectTo ?? "/");
+  }
+
   function clearAuth() {
     user.value = null;
     token.value = null;
@@ -82,37 +100,29 @@ export const useAuthStore = defineStore("auth", () => {
       console.log("POST method made", payload.email, payload.username);
       navigateTo(redirectTo);
     } catch (err: any) {
-      console.log("=== CAUGHT ERROR IN AUTH STORE ===");
-      console.log("err:", err);
-      console.log("err.data:", err.data);
-      console.log("========================");
-
       let errorMessage = "";
-
-      //   const errorMessage = Array.isArray(err.data)
-      //     ? err.data.map((e: any) => e.description || e.message).join(" ")
-      //     : err.data?.message || err.data?.description || "Registration failed.";
-
-      //   throw new Error(errorMessage);
       if (Array.isArray(err.data)) {
-        console.log("It's an array");
         errorMessage = err.data
           .map((e: any) => e.description || e.message)
           .join(" ");
       } else if (err.data?.message) {
-        console.log("It has a message property");
         errorMessage = err.data.message;
       } else if (err.data?.description) {
-        console.log("It has a description property");
         errorMessage = err.data.description;
       } else {
-        console.log("Using fallback");
         errorMessage = err.message || "Registration failed.";
       }
-
-      console.log("Final error message:", errorMessage);
       throw new Error(errorMessage);
     }
   }
-  return { user, token, isAuthenticated, login, clearAuth, logout, register };
+  return {
+    user,
+    token,
+    isAuthenticated,
+    login,
+    autoLogin,
+    clearAuth,
+    logout,
+    register,
+  };
 });
