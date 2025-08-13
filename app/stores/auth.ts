@@ -84,9 +84,6 @@ export const useAuthStore = defineStore("auth", () => {
     payload: { email: string; username: string; password: string },
     redirectTo?: string
   ) {
-    console.log("=== REGISTER FUNCTION CALLED ===");
-    console.log("payload:", payload);
-
     const url = `${baseUrl}/api/account/register`;
 
     try {
@@ -97,7 +94,6 @@ export const useAuthStore = defineStore("auth", () => {
           "Content-Type": "application/json",
         },
       });
-      console.log("POST method made", payload.email, payload.username);
       navigateTo(redirectTo);
     } catch (err: any) {
       let errorMessage = "";
@@ -115,6 +111,28 @@ export const useAuthStore = defineStore("auth", () => {
       throw new Error(errorMessage);
     }
   }
+
+  async function forgotUsername(email: string) {
+    const url = `${baseUrl}/api/account/forgot-username`;
+
+    try {
+      const data = await $fetch<{ message: string }>(url, {
+        method: "POST",
+        body: { email },
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+      console.log(data, "DATAAAAA");
+      return { success: true, message: data.message };
+    } catch (err: any) {
+      const errorMessage =
+        err.data?.message ||
+        err.message ||
+        "Failed to send the email reminder.";
+      throw new Error(errorMessage);
+    }
+  }
   return {
     user,
     token,
@@ -124,5 +142,6 @@ export const useAuthStore = defineStore("auth", () => {
     clearAuth,
     logout,
     register,
+    forgotUsername,
   };
 });
