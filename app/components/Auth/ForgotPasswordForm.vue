@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { reactive, ref } from "vue";
+import { ref, reactive } from "vue";
 
 import { useAuthMethods } from "@/composables/useAuthMethods";
 
@@ -11,7 +11,7 @@ const isSuccess = ref(false);
 const successMessage = ref("");
 const errorMessage = ref("");
 
-async function onSubmitForgotUsernameForm() {
+async function onSubmitForgotPasswordForm() {
   try {
     isLoading.value = true;
     errorMessage.value = "";
@@ -21,7 +21,7 @@ async function onSubmitForgotUsernameForm() {
     if (form.email.length < 6)
       throw new Error("Email must be at least 6 characters.");
 
-    const result = await auth.forgotUsername(form.email);
+    const result = await auth.forgotPassword(form.email);
 
     successMessage.value = result.message;
     isSuccess.value = true;
@@ -30,7 +30,7 @@ async function onSubmitForgotUsernameForm() {
       err.data ||
       err.message ||
       err.statusMessage ||
-      "Emailing your username failed."; // Ordering is important obviously!
+      "Emailing a password reset link failed."; // Ordering is important obviously!
   } finally {
     isLoading.value = false;
   }
@@ -59,7 +59,7 @@ function goToLoginPage() {
     </div>
     <form
       v-else
-      @submit.prevent="onSubmitForgotUsernameForm"
+      @submit.prevent="onSubmitForgotPasswordForm"
       class="flex flex-col w-full p-6 space-y-4 bg-gray-200 rounded-md shadow-md/80"
     >
       <div
@@ -99,7 +99,7 @@ function goToLoginPage() {
           type="submit"
           class="px-4 py-1 text-lg bg-green-600 rounded-md cursor-pointer text-slate-50 hover:bg-green-700 disabled:cursor-not-allowed disabled:bg-slate-500/70 disabled:text-black"
         >
-          {{ isLoading ? "Sending username to email..." : "Submit" }}
+          {{ isLoading ? "Emailing your password reset..." : "Submit" }}
         </button>
       </div>
     </form>
