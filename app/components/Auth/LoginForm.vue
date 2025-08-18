@@ -54,7 +54,14 @@ async function showPassword() {
       class="flex flex-col p-6 space-y-4 rounded-md shadow-md bg-gray-200/80"
     >
       <div class="flex flex-col items-start justify-center w-full space-y-2">
-        <label class="text-3xl" for="username">Username:</label>
+        <div class="flex items-end justify-between w-full">
+          <label class="flex text-3xl" for="username">Username:</label>
+          <NuxtLink
+            to="/forgot-username"
+            class="px-4 py-1 text-sm italic underline transition rounded-md cursor-pointer hover:text-green-600"
+            >Forgot username?</NuxtLink
+          >
+        </div>
         <input
           v-model="form.username"
           :disabled="isLoading"

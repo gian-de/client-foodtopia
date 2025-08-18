@@ -42,7 +42,7 @@ function goToLoginPage() {
 </script>
 
 <template>
-  <div class="max-w-2xl mx-auto">
+  <div class="w-full max-w-2xl mx-auto">
     <div
       v-if="isSuccess"
       class="flex flex-col items-center p-8 space-y-6 rounded-md shadow-md bg-green-50"
@@ -62,9 +62,7 @@ function goToLoginPage() {
       @submit.prevent="onSubmitForgotPasswordForm"
       class="flex flex-col w-full p-6 space-y-4 bg-gray-200 rounded-md shadow-md/80"
     >
-      <div
-        class="flex flex-col items-start justify-center w-full space-y-2 bg-red-200"
-      >
+      <div class="flex flex-col items-start justify-center w-full space-y-2">
         <label class="text-3xl" for="username">Email:</label>
         <input
           v-model="form.email"
