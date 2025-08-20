@@ -80,10 +80,11 @@ export const useAuthStore = defineStore("auth", () => {
     navigateTo("/");
   }
 
-  async function register(
-    payload: { email: string; username: string; password: string },
-    redirectTo?: string
-  ) {
+  async function register(payload: {
+    email: string;
+    username: string;
+    password: string;
+  }) {
     const url = `${baseUrl}/api/account/register`;
 
     try {
@@ -94,7 +95,9 @@ export const useAuthStore = defineStore("auth", () => {
           "Content-Type": "application/json",
         },
       });
-      navigateTo(redirectTo);
+      const redirectUrl = "/confirm-email";
+      const emailParam = encodeURIComponent(payload.email);
+      navigateTo(`${redirectUrl}?email=${emailParam}`);
     } catch (err: any) {
       let errorMessage = "";
       if (Array.isArray(err.data)) {

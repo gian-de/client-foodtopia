@@ -55,14 +55,11 @@ async function onSubmitRegisterInfo() {
     if (registerForm.password !== registerForm.confirmPassword)
       throw new Error("Passwords don't match.");
 
-    await auth.register(
-      {
-        email: registerForm.email,
-        username: registerForm.username,
-        password: registerForm.password,
-      },
-      "confirm-email"
-    );
+    await auth.register({
+      email: registerForm.email,
+      username: registerForm.username,
+      password: registerForm.password,
+    });
   } catch (err: any) {
     errorMessage.value = err.message || "Attempt to register failed.";
   } finally {
@@ -74,7 +71,7 @@ async function onSubmitRegisterInfo() {
   <div class="max-w-2xl mx-auto">
     <form
       @submit.prevent="onSubmitRegisterInfo"
-      class="flex flex-col p-6 space-y-4 rounded-md shadow-md bg-gray-200/80"
+      class="flex flex-col p-6 space-y-4 rounded-md shadow-md bg-zinc-200/80"
     >
       <div class="flex flex-col items-start justify-center w-full space-y-2">
         <label class="text-3xl" for="username">Username:</label>
@@ -157,6 +154,14 @@ async function onSubmitRegisterInfo() {
           </NuxtLink>
         </span>
         <button
+          v-if="isLoading"
+          :disabled="isLoading"
+          class="px-4 py-1 text-lg bg-green-800 rounded-md cursor-not-allowed text-slate-50 hover:bg-green-700"
+        >
+          Creating account...
+        </button>
+        <button
+          v-else
           class="px-4 py-1 text-lg bg-green-600 rounded-md cursor-pointer text-slate-50 hover:bg-green-700"
         >
           Register
@@ -175,6 +180,5 @@ async function onSubmitRegisterInfo() {
         >
       </span>
     </div>
-    <div class="pb-[2000px]"></div>
   </div>
 </template>

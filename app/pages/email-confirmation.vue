@@ -27,6 +27,8 @@ onMounted(async () => {
     } catch (error) {
       await navigateTo("/login");
     }
+  } else {
+    statusMessage.value = message;
   }
 });
 </script>

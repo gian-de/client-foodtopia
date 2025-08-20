@@ -51,7 +51,7 @@ async function showPassword() {
   <div class="max-w-2xl mx-auto">
     <form
       @submit.prevent="onSubmitLoginForm"
-      class="flex flex-col p-6 space-y-4 rounded-md shadow-md bg-gray-200/80"
+      class="flex flex-col p-6 space-y-4 rounded-md shadow-md bg-zinc-200/80"
     >
       <div class="flex flex-col items-start justify-center w-full space-y-2">
         <div class="flex items-end justify-between w-full">

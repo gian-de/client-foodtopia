@@ -60,7 +60,7 @@ function goToLoginPage() {
     <form
       v-else
       @submit.prevent="onSubmitForgotPasswordForm"
-      class="flex flex-col w-full p-6 space-y-4 bg-gray-200 rounded-md shadow-md/80"
+      class="flex flex-col w-full p-6 space-y-4 rounded-md bg-zinc-200/80 shadow-md/80"
     >
       <div class="flex flex-col items-start justify-center w-full space-y-2">
         <label class="text-3xl" for="username">Email:</label>
