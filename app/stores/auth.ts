@@ -6,9 +6,52 @@ export const useAuthStore = defineStore("auth", () => {
   const config = useRuntimeConfig();
   const baseUrl = config.public.BASE_API_URL;
 
-  const user = ref<AuthUser | null>(null);
   const token = ref<string | null>(null);
+  const user = ref<AuthUser | null>(null);
   const isAuthenticated = ref(false);
+
+  function initAuth() {
+    if (import.meta.client) {
+      const storedToken = localStorage.getItem("authToken");
+      const storedUser = localStorage.getItem("authUser");
+
+      if (storedToken && storedUser) {
+        try {
+          token.value = storedToken;
+          user.value = JSON.parse(storedUser);
+          isAuthenticated.value = true;
+        } catch (error) {
+          console.log("Failed parsing stored auth creds...", error);
+          clearAuth();
+        }
+      }
+    }
+  }
+
+  function authSyncCrossTab() {
+    if (import.meta.client) {
+      window.addEventListener("storage", (e) => {
+        if (e.key === "authToken" || e.key === "authUser") {
+          const storedToken = localStorage.getItem("authToken");
+          const storedUser = localStorage.getItem("authUser");
+          if (storedToken && storedUser) {
+            // If another tab logs in - sync current tab too
+            try {
+              const storedUserData = JSON.parse(storedUser);
+              token.value = storedToken;
+              user.value = storedUserData;
+              isAuthenticated.value = true;
+            } catch (error) {
+              // console.error("Sync login from another tab", error);
+            }
+          } else {
+            // Other tab logs out, sync current also
+            clearAuth();
+          }
+        }
+      });
+    }
+  }
 
   async function login(
     payload: { username: string; password: string },
@@ -119,6 +162,8 @@ export const useAuthStore = defineStore("auth", () => {
     user,
     token,
     isAuthenticated,
+    initAuth,
+    authSyncCrossTab,
     login,
     autoLogin,
     clearAuth,

@@ -37,7 +37,10 @@ async function onSubmitRegisterInfo() {
       throw new Error("Email must be at least 6 characters.");
     if (!registerForm.password.trim()) throw new Error("Password is required.");
     if (registerForm.password.length < 6)
-      throw new Error("Username must be at least 6 characters.");
+      throw new Error("Password must be at least 6 characters.");
+    if (!/\d/.test(registerForm.password)) {
+      throw new Error("Password must contain at least one number.");
+    }
     if (!/[^a-zA-Z0-9]/.test(registerForm.password)) {
       throw new Error(
         "Password must contain at least one special character (!@#$%^&*)."
@@ -45,20 +48,13 @@ async function onSubmitRegisterInfo() {
     }
     if (!registerForm.confirmPassword.trim())
       throw new Error("Confirmed password is required.");
-    if (registerForm.confirmPassword.length < 8)
-      throw new Error("Confirmed password must be at least 8 characters.");
-    if (!/[^a-zA-Z0-9]/.test(registerForm.confirmPassword)) {
-      throw new Error(
-        "Password must contain at least one special character (!@#$%^&* etc.)."
-      );
-    }
     if (registerForm.password !== registerForm.confirmPassword)
       throw new Error("Passwords don't match.");
 
     await auth.register({
-      email: registerForm.email,
-      username: registerForm.username,
-      password: registerForm.password,
+      email: registerForm.email.toLowerCase().trim(),
+      username: registerForm.username.trim(),
+      password: registerForm.password.trim(),
     });
   } catch (err: any) {
     errorMessage.value = err.message || "Attempt to register failed.";
