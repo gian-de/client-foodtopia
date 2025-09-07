@@ -3,6 +3,8 @@ import { ref, onMounted } from "vue";
 
 import { useAuthStore } from "@/stores/auth";
 
+definePageMeta({ middleware: "guest" });
+
 const route = useRoute();
 const auth = useAuthStore();
 

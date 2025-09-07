@@ -1,5 +1,9 @@
 <script setup lang="ts">
 import LoginForm from "~/components/auth/LoginForm.vue";
+
+definePageMeta({
+  middleware: "guest",
+});
 </script>
 
 <template>

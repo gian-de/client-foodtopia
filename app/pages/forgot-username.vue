@@ -1,5 +1,9 @@
 <script setup lang="ts">
 import ForgotUsernameForm from "@/components/auth/ForgotUsernameForm.vue";
+
+definePageMeta({
+  middleware: "guest",
+});
 </script>
 
 <template>

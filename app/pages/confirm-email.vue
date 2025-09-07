@@ -1,5 +1,8 @@
 <script setup lang="ts">
 import { computed } from "vue";
+
+definePageMeta({ middleware: "guest" });
+
 const route = useRoute();
 
 const email = computed(() => decodeURIComponent(route.query.email as string));
