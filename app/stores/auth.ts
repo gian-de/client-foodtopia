@@ -71,6 +71,7 @@ export const useAuthStore = defineStore("auth", () => {
       user.value = {
         username: data.userName,
         email: data.email,
+        role: data.role,
       };
 
       isAuthenticated.value = true;
@@ -90,13 +91,14 @@ export const useAuthStore = defineStore("auth", () => {
   }
 
   async function autoLogin(
-    userData: { token: string; username: string; email: string },
+    userData: { token: string; username: string; email: string; role: string },
     redirectTo?: string
   ) {
     token.value = userData.token;
     user.value = {
       username: userData.username,
       email: userData.email,
+      role: userData.role,
     };
     isAuthenticated.value = true;
 
