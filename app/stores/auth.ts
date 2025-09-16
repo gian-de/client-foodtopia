@@ -160,6 +160,37 @@ export const useAuthStore = defineStore("auth", () => {
     }
   }
 
+  async function guestLogin(redirectTo?: string) {
+    const url = `${baseUrl}/api/account/guest-login`;
+    try {
+      const data = await $fetch<AuthResponse>(url, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+      (token.value = data.jwtToken),
+        (user.value = {
+          username: data.userName,
+          email: data.email,
+          role: data.role,
+        });
+
+      isAuthenticated.value = true;
+
+      if (import.meta.client) {
+        localStorage.setItem("authUser", JSON.stringify(user.value));
+        localStorage.setItem("authToken", token.value);
+      }
+
+      await navigateTo(redirectTo ?? "/");
+    } catch (err: any) {
+      const statusCode = err.status ?? 500;
+      const statusMessage = err.message || "Guest login failed";
+      throw createError({ statusCode, statusMessage, data: err.data });
+    }
+  }
+
   return {
     user,
     token,
@@ -171,5 +202,6 @@ export const useAuthStore = defineStore("auth", () => {
     clearAuth,
     logout,
     register,
+    guestLogin,
   };
 });

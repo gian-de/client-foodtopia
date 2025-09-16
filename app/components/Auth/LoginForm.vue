@@ -45,6 +45,19 @@ async function showPassword() {
   isPasswordHidden.value = !isPasswordHidden.value;
   return;
 }
+
+async function onGuestLogin() {
+  try {
+    isLoading.value = true;
+    errorMessage.value = "";
+    await auth.guestLogin();
+  } catch (err: any) {
+    errorMessage.value =
+      err.data || err.message || err.statusMessage || "Guest login failed.";
+  } finally {
+    isLoading.value = false;
+  }
+}
 </script>
 
 <template>
@@ -133,10 +146,13 @@ async function showPassword() {
         be signed in to utilize.
       </h2>
       <span class="pr-6 ml-auto">
-        <NuxtLink
+        <button
+          :disabled="isLoading"
+          @click="onGuestLogin"
           class="px-4 py-1 transition border-2 border-green-600 rounded-md cursor-pointer w-fit hover:text-slate-50 hover:bg-green-600"
-          >Login as guest</NuxtLink
         >
+          {{ isLoading ? "Logging in..." : "Login as guest" }}
+        </button>
       </span>
     </div>
   </div>
