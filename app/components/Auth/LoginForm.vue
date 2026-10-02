@@ -32,13 +32,9 @@ async function onSubmitLoginForm() {
     if (form.password.length > 100)
       throw new Error("Password cannot be more than 100 characters.");
 
-    await auth.login(
-      { username: form.username, password: form.password },
-      form.username
-    );
-  } catch (err: any) {
-    errorMessage.value =
-      err.data || err.message || err.statusMessage || "Login failed.";
+    await auth.login({ username: form.username, password: form.password });
+  } catch (err: unknown) {
+    errorMessage.value = err instanceof Error ? err.message : "Login failed.";
   } finally {
     isLoading.value = false;
   }

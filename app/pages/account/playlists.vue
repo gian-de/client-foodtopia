@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import EmptyState from "~/components/ui/EmptyState.vue";
+import ImagePicker from "~/components/ImagePicker.vue";
 import { pageItems, text } from "~/utils/json";
 import { serverErrorMessage } from "~/utils/apiErrorMessage";
 
@@ -12,9 +14,10 @@ const errorMessage = ref("");
 const successMessage = ref("");
 const isLoading = ref(false);
 const isSaving = ref(false);
+const photoBusy = ref(false);
 const editingId = ref("");
 
-const createForm = reactive({ name: "", slugText: "", slugNumber: 1 });
+const createForm = reactive({ name: "", slugText: "", slugNumber: 1, imageUrls: [""] });
 const editForm = reactive({ name: "", slugText: "", slugNumber: 1, recipeId: "" });
 
 function idOf(item: Record<string, unknown>) {
@@ -37,6 +40,17 @@ async function onCreate() {
   isSaving.value = true;
   errorMessage.value = "";
   successMessage.value = "";
+  const imageUrl = createForm.imageUrls.map((url) => url.trim()).filter(Boolean)[0] ?? "";
+  if (photoBusy.value) {
+    errorMessage.value = "Wait for the photo upload to finish.";
+    isSaving.value = false;
+    return;
+  }
+  if (!imageUrl) {
+    errorMessage.value = "Add a photo.";
+    isSaving.value = false;
+    return;
+  }
   try {
     await authFetch("/api/playlists", {
       method: "POST",
@@ -44,11 +58,13 @@ async function onCreate() {
         name: createForm.name.trim(),
         slugText: createForm.slugText.trim(),
         slugNumber: Number(createForm.slugNumber),
+        imageUrl,
       },
     });
     successMessage.value = "Playlist created.";
     createForm.name = "";
     createForm.slugText = "";
+    createForm.imageUrls = [""];
     await load();
   } catch (err) {
     errorMessage.value = err instanceof Error ? err.message : "Could not create the playlist.";
@@ -170,6 +186,15 @@ onMounted(load);
             Name
             <input v-model="createForm.name" required :class="inputClass" />
           </label>
+          <div class="space-y-2">
+            <p class="text-sm font-medium text-stone-700">Photo</p>
+            <ImagePicker
+              v-model="createForm.imageUrls"
+              :max="1"
+              folder="/playlists"
+              @update:busy="photoBusy = $event"
+            />
+          </div>
           <div class="grid grid-cols-2 gap-3">
             <label class="block space-y-2 text-sm font-medium text-stone-700">
               Slug words
@@ -180,7 +205,7 @@ onMounted(load);
               <input v-model.number="createForm.slugNumber" type="number" min="0" required :class="inputClass" />
             </label>
           </div>
-          <button type="submit" :disabled="isSaving" class="w-full px-5 py-2.5 text-sm font-medium text-white rounded-md bg-brand-600 hover:bg-brand-700 disabled:opacity-60">
+          <button type="submit" :disabled="isSaving || photoBusy" class="w-full px-5 py-2.5 text-sm font-medium text-white rounded-md bg-brand-600 hover:bg-brand-700 disabled:opacity-60">
             Create playlist
           </button>
         </form>

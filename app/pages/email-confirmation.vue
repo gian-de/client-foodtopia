@@ -24,7 +24,7 @@ onMounted(async () => {
           username: decodeURIComponent(username),
           email: decodeURIComponent(email),
         },
-        "/"
+        "/account"
       );
     } catch (error) {
       await navigateTo("/login");

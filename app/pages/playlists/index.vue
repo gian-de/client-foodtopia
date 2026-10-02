@@ -1,7 +1,8 @@
 <script setup lang="ts">
 import { pageItems, text } from "~/utils/json";
+import { mediaUrl } from "~/utils/mediaUrl";
 
-const { apiUrl } = useApiBase();
+const { apiUrl, assetBase } = useApiBase();
 
 const { data: playlists, pending: isLoading, error } = await useAsyncData("public-playlists", async () => {
   const data = await $fetch(apiUrl("/api/playlists?page=1&pageSize=24&sortBy=heartedByCount&sortDirection=desc"));
@@ -26,8 +27,15 @@ const errorMessage = computed(() => (error.value ? "Could not load playlists." :
       <li
         v-for="playlist in playlists"
         :key="text(playlist, 'id', 'Id')"
-        class="flex items-start justify-between gap-3 p-5 bg-white border rounded-lg border-stone-200"
+        class="overflow-hidden bg-white border rounded-lg border-stone-200"
       >
+        <img
+          v-if="text(playlist, 'imageUrl', 'ImageUrl')"
+          :src="mediaUrl(assetBase, text(playlist, 'imageUrl', 'ImageUrl'))"
+          :alt="text(playlist, 'name', 'Name')"
+          class="object-cover w-full h-40 bg-stone-200"
+        />
+        <div class="flex items-start justify-between gap-3 p-5">
         <div class="space-y-1">
           <NuxtLink
             :to="`/playlists/${text(playlist, 'fullSlug', 'FullSlug')}`"
@@ -44,6 +52,7 @@ const errorMessage = computed(() => (error.value ? "Could not load playlists." :
           :id="text(playlist, 'id', 'Id')"
           :count="Number(text(playlist, 'heartedByCount', 'HeartedByCount') || 0)"
         />
+        </div>
       </li>
     </ul>
   </div>

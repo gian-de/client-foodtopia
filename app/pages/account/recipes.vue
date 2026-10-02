@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import EmptyState from "~/components/ui/EmptyState.vue";
+import ImagePicker from "~/components/ImagePicker.vue";
 import { pageItems, text } from "~/utils/json";
 import { serverErrorMessage } from "~/utils/apiErrorMessage";
 
@@ -13,12 +15,13 @@ const errorMessage = ref("");
 const successMessage = ref("");
 const isLoading = ref(false);
 const isSaving = ref(false);
+const photosBusy = ref(false);
 const submittingId = ref("");
 
 const form = reactive({
   name: "",
   countryId: "",
-  imageUrl: "",
+  imageUrls: [""] as string[],
   prepTimeMinutes: 15,
   cookTimeMinutes: 20,
   ingredientName: "",
@@ -50,13 +53,30 @@ async function onCreate() {
   isSaving.value = true;
   errorMessage.value = "";
   successMessage.value = "";
+  const imageUrls = form.imageUrls.map((url) => url.trim()).filter(Boolean);
+  if (photosBusy.value) {
+    errorMessage.value = "Wait for the photo upload to finish.";
+    isSaving.value = false;
+    return;
+  }
+  if (imageUrls.length < 1) {
+    errorMessage.value = "Add at least one photo.";
+    isSaving.value = false;
+    return;
+  }
+  if (imageUrls.length > 5) {
+    errorMessage.value = "A recipe can have at most 5 photos.";
+    isSaving.value = false;
+    return;
+  }
   try {
     await authFetch("/api/recipes", {
       method: "POST",
       body: {
         name: form.name.trim(),
         countryId: form.countryId,
-        imageUrl: form.imageUrl.trim(),
+        imageUrl: imageUrls[0],
+        imageUrls,
         prepTimeMinutes: Number(form.prepTimeMinutes),
         cookTimeMinutes: Number(form.cookTimeMinutes),
         ingredients: [
@@ -71,7 +91,7 @@ async function onCreate() {
     });
     successMessage.value = "Recipe created. Submit it from the Submissions tab when it is ready for review.";
     form.name = "";
-    form.imageUrl = "";
+    form.imageUrls = [""];
     form.ingredientName = "";
     form.instruction = "";
     await load();
@@ -165,10 +185,17 @@ onMounted(load);
           </option>
         </select>
       </label>
-      <label class="block space-y-2 text-sm font-medium text-stone-700">
-        Image URL
-        <input v-model="form.imageUrl" required :class="inputClass" placeholder="https://" />
-      </label>
+      <div class="space-y-2">
+        <p class="text-sm font-medium text-stone-700">Photos</p>
+        <p class="text-sm text-stone-500">Add at least 1 photo and up to 5. You can stop after the first.</p>
+        <ImagePicker
+          v-model="form.imageUrls"
+          :max="5"
+          folder="/recipes"
+          cover
+          @update:busy="photosBusy = $event"
+        />
+      </div>
       <div class="grid grid-cols-2 gap-3">
         <label class="block space-y-2 text-sm font-medium text-stone-700">
           Prep minutes
@@ -205,7 +232,7 @@ onMounted(load);
       </p>
       <button
         type="submit"
-        :disabled="isSaving"
+        :disabled="isSaving || photosBusy"
         class="w-full px-5 py-2.5 text-sm font-medium text-white rounded-md bg-brand-600 hover:bg-brand-700 disabled:opacity-60 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-600"
       >
         {{ isSaving ? "Creating…" : "Create recipe" }}

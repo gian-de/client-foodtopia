@@ -22,6 +22,11 @@ const errorMessage = computed(
 );
 
 const heartCount = ref(0);
+const selectedImage = ref(0);
+watch(recipe, () => {
+  selectedImage.value = 0;
+});
+const gallery = computed(() => recipe.value?.imageUrls?.length ? recipe.value.imageUrls : recipe.value?.imageUrl ? [recipe.value.imageUrl] : []);
 watch(
   recipe,
   (value) => {
@@ -70,7 +75,7 @@ function formatIngredient(quantity: number, measurement: string | null) {
         class="relative overflow-hidden bg-stone-200 rounded-lg"
       >
         <img
-          :src="recipeImage(recipe.imageUrl)"
+          :src="recipeImage(gallery[selectedImage] || recipe.imageUrl)"
           :alt="recipe.name"
           class="object-cover w-full max-h-[480px]"
         />
@@ -85,6 +90,19 @@ function formatIngredient(quantity: number, measurement: string | null) {
             class="object-cover w-12 h-8 bg-white border rounded-sm shadow-sm border-stone-200"
           />
         </NuxtLink>
+      </div>
+      <div v-if="gallery.length > 1" class="flex gap-2">
+        <button
+          v-for="(image, index) in gallery"
+          :key="image + index"
+          type="button"
+          class="overflow-hidden border rounded-md size-16 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-600"
+          :class="index === selectedImage ? 'border-brand-600' : 'border-stone-200'"
+          :aria-label="`Show photo ${index + 1}`"
+          @click="selectedImage = index"
+        >
+          <img :src="recipeImage(image)" alt="" class="object-cover w-full h-full" />
+        </button>
       </div>
 
       <header class="space-y-4">

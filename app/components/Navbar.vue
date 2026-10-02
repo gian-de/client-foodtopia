@@ -10,7 +10,26 @@ const navAuthLinks = [
 const auth = useAuthStore();
 const route = useRoute();
 const { isAuthenticated, user } = storeToRefs(auth);
-const onSettings = computed(() => route.path.startsWith("/account/settings"));
+function normalizedPath(path: string) {
+  return path.replace(/\/$/, "") || "/";
+}
+
+const onSettings = computed(() => {
+  const path = normalizedPath(route.path);
+  return (
+    path.startsWith("/account/settings") ||
+    ["/change-username", "/change-email", "/change-password", "/delete-account"].includes(path)
+  );
+});
+const onDashboard = computed(() => {
+  const path = normalizedPath(route.path);
+  return (
+    path === "/account" ||
+    ["/account/recipes", "/account/playlists", "/account/favorites", "/account/submissions"].some(
+      (item) => path === item || path.startsWith(`${item}/`)
+    )
+  );
+});
 const isModerator = computed(() =>
   ["Owner", "Senior Admin", "Admin"].includes(user.value?.role ?? "")
 );
@@ -35,7 +54,8 @@ function onClickSignOut() {
             <NuxtLink
               to="/account"
               class="transition-colors hover:text-brand-600 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-600"
-              active-class="!text-brand-600"
+              :class="onDashboard ? '!text-brand-600' : ''"
+              :aria-current="onDashboard ? 'page' : undefined"
             >
               Dashboard
             </NuxtLink>
@@ -45,7 +65,7 @@ function onClickSignOut() {
               class="transition-colors hover:text-brand-600 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-600"
               active-class="!text-brand-600"
             >
-              Review
+              Admin
             </NuxtLink>
             <NuxtLink
               to="/account/settings"

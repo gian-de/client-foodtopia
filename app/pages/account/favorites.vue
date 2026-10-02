@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import EmptyState from "~/components/ui/EmptyState.vue";
 import { pageItems, text } from "~/utils/json";
 import HeartIcon from "@/components/svgs/HeartIcon.vue";
 

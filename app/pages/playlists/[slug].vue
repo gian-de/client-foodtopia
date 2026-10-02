@@ -1,8 +1,9 @@
 <script setup lang="ts">
 import { asRecord, field, text } from "~/utils/json";
+import { mediaUrl } from "~/utils/mediaUrl";
 
 const route = useRoute();
-const { apiUrl } = useApiBase();
+const { apiUrl, assetBase } = useApiBase();
 
 const { data: playlist, pending: isLoading, error } = await useAsyncData(
   () => `playlist-${route.params.slug}`,
@@ -38,6 +39,12 @@ watch(
     </p>
     <p v-else-if="isLoading" class="text-stone-600">Loading playlist...</p>
     <article v-else-if="playlist" class="max-w-3xl mx-auto space-y-8">
+      <img
+        v-if="text(playlist, 'imageUrl', 'ImageUrl')"
+        :src="mediaUrl(assetBase, text(playlist, 'imageUrl', 'ImageUrl'))"
+        :alt="text(playlist, 'name', 'Name')"
+        class="object-cover w-full max-h-[420px] bg-stone-200 rounded-lg"
+      />
       <header class="space-y-3">
         <h1 class="text-3xl font-bold text-stone-900 sm:text-4xl">
           {{ text(playlist, "name", "Name") }}
