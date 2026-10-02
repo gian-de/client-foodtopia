@@ -2,7 +2,9 @@
 definePageMeta({ middleware: "auth" });
 
 const auth = useAuthStore();
+const route = useRoute();
 const isGuest = computed(() => auth.user?.role === "Guest");
+const showDashboard = computed(() => !route.path.startsWith("/account/settings"));
 
 const links = [
   { to: "/account/recipes", label: "Recipes", guestLocked: false },
@@ -15,7 +17,7 @@ const links = [
 <template>
   <div class="px-6 py-10">
     <div class="max-w-5xl mx-auto space-y-6">
-      <header class="space-y-2">
+      <header v-if="showDashboard" class="space-y-2">
         <h1 class="text-2xl font-bold text-stone-900 sm:text-3xl">Dashboard</h1>
         <p class="text-stone-600">
           Create recipes and playlists, then submit them for review. A playlist
@@ -23,6 +25,7 @@ const links = [
         </p>
       </header>
       <nav
+        v-if="showDashboard"
         class="inline-flex flex-wrap gap-1 p-1 bg-white border rounded-lg border-brand-100"
         aria-label="Account"
       >

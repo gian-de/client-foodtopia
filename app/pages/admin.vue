@@ -1,17 +1,23 @@
 <script setup lang="ts">
 definePageMeta({ middleware: "admin" });
 
-const links = [
-  { to: "/admin", label: "Recipes" },
-  { to: "/admin/playlists", label: "Playlists" },
-];
+const auth = useAuthStore();
+const isOwner = computed(() => auth.user?.role === "Owner");
+const links = computed(() => {
+  const items = [
+    { to: "/admin", label: "Recipes" },
+    { to: "/admin/playlists", label: "Playlists" },
+  ];
+  if (isOwner.value) items.push({ to: "/admin/people", label: "People" });
+  return items;
+});
 </script>
 
 <template>
   <div class="px-6 py-10">
     <div class="max-w-5xl mx-auto space-y-6">
       <header class="space-y-2">
-        <h1 class="text-2xl font-bold text-stone-900 sm:text-3xl">Review queue</h1>
+        <h1 class="text-2xl font-bold text-stone-900 sm:text-3xl">Admin</h1>
         <p class="text-stone-600">
           Approve or deny recipe and playlist submissions. A denied review needs a comment.
           Approving a recipe makes it public, which is required before it can join a public playlist.
@@ -19,7 +25,7 @@ const links = [
       </header>
       <nav
         class="inline-flex gap-1 p-1 bg-white border rounded-lg border-brand-100"
-        aria-label="Review"
+        aria-label="Admin"
       >
         <NuxtLink
           v-for="link in links"

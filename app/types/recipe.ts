@@ -27,6 +27,7 @@ export interface Recipe {
   id: string;
   name: string;
   imageUrl: string;
+  imageUrls: string[];
   heartCount: number;
   tasteAverage: number | null;
   difficultyAverage: number | null;

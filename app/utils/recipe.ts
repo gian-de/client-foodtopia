@@ -42,6 +42,13 @@ export function normalizeRecipe(rawInput: unknown): Recipe {
     id: String(pick(raw, "id", "Id") ?? ""),
     name: String(pick(raw, "name", "Name") ?? ""),
     imageUrl: String(pick(raw, "imageUrl", "ImageUrl") ?? ""),
+    imageUrls: (() => {
+      const listed = pick(raw, "imageUrls", "ImageUrls");
+      const urls = Array.isArray(listed) ? listed.map((item) => String(item)).filter(Boolean) : [];
+      const cover = String(pick(raw, "imageUrl", "ImageUrl") ?? "");
+      if (!urls.length && cover) urls.push(cover);
+      return urls.slice(0, 5);
+    })(),
     heartCount: asNumber(pick(raw, "heartCount", "HeartCount")),
     tasteAverage: (pick(raw, "tasteAverage", "TasteAverage") as number | null) ?? null,
     difficultyAverage:

@@ -80,12 +80,9 @@ export const useAuthStore = defineStore("auth", () => {
         localStorage.setItem("authToken", token.value);
       }
 
-      await navigateTo(redirectTo ?? "/");
-    } catch (err: any) {
-      const statusCode = err.status ?? 500;
-      const statusMessage = err.message || "Login failed";
-
-      throw createError({ statusCode, statusMessage, data: err.data });
+      await navigateTo(redirectTo ?? "/account");
+    } catch (err: unknown) {
+      throw new Error(apiErrorMessage(err, "Login failed."));
     }
   }
 
@@ -105,7 +102,7 @@ export const useAuthStore = defineStore("auth", () => {
       localStorage.setItem("authUser", JSON.stringify(user.value));
       localStorage.setItem("authToken", token.value);
     }
-    await navigateTo(redirectTo ?? "/");
+    await navigateTo(redirectTo ?? "/account");
   }
 
   function updateUser(partial: Partial<AuthUser>) {
@@ -180,7 +177,7 @@ export const useAuthStore = defineStore("auth", () => {
         localStorage.setItem("authToken", token.value);
       }
 
-      await navigateTo(redirectTo ?? "/");
+      await navigateTo(redirectTo ?? "/account");
     } catch (err: any) {
       const statusCode = err.status ?? 500;
       const statusMessage = err.message || "Guest login failed";
