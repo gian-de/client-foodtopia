@@ -10,7 +10,7 @@ const emit = defineEmits<{
 
 <template>
   <div class="space-y-4">
-    <h2 class="text-lg font-semibold text-stone-900 dark:text-stone-100">
+    <h2 class="text-lg font-semibold text-stone-900">
       Popular searches
     </h2>
     <div class="flex flex-wrap gap-2">

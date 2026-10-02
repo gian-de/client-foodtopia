@@ -7,6 +7,7 @@ import EyeIcon from "@/components/svgs/EyeIcon.vue";
 import EyeIconSlash from "@/components/svgs/EyeIconSlash.vue";
 
 const auth = useAuthStore();
+const { apiUrl } = useApiBase();
 
 const registerForm = reactive({
   username: "",
@@ -17,10 +18,14 @@ const registerForm = reactive({
 
 const isLoading = ref(false);
 const errorMessage = ref("");
+const resendEmail = ref("");
+const resendNotice = ref("");
+const resendError = ref("");
+const isResending = ref(false);
 const isPasswordHidden = ref(true);
 
 const inputClass =
-  "w-full px-4 py-2.5 text-base border rounded-md border-stone-300 bg-white text-stone-900 placeholder:text-stone-400 focus:outline-none focus:border-brand-500 focus:ring-2 focus:ring-brand-500/20 disabled:opacity-60 dark:border-stone-600 dark:bg-stone-950 dark:text-stone-100 dark:placeholder:text-stone-500";
+  "w-full px-4 py-2.5 text-base border rounded-md border-stone-300 bg-white text-stone-900 placeholder:text-stone-400 focus:outline-none focus:border-brand-500 focus:ring-2 focus:ring-brand-500/20 disabled:opacity-60";
 
 function togglePassword() {
   isPasswordHidden.value = !isPasswordHidden.value;
@@ -38,8 +43,14 @@ async function onSubmitRegisterInfo() {
     if (registerForm.email.length < 6)
       throw new Error("Email must be at least 6 characters.");
     if (!registerForm.password.trim()) throw new Error("Password is required.");
-    if (registerForm.password.length < 6)
-      throw new Error("Password must be at least 6 characters.");
+    if (registerForm.password.length < 8)
+      throw new Error("Password must be at least 8 characters.");
+    if (!/[A-Z]/.test(registerForm.password)) {
+      throw new Error("Password must contain at least one uppercase letter.");
+    }
+    if (!/[a-z]/.test(registerForm.password)) {
+      throw new Error("Password must contain at least one lowercase letter.");
+    }
     if (!/\d/.test(registerForm.password)) {
       throw new Error("Password must contain at least one number.");
     }
@@ -65,6 +76,29 @@ async function onSubmitRegisterInfo() {
   }
 }
 
+async function resendConfirmation() {
+  const email = resendEmail.value.toLowerCase().trim();
+  resendNotice.value = "";
+  resendError.value = "";
+  if (!email) {
+    resendError.value = "Email is required.";
+    return;
+  }
+  isResending.value = true;
+  try {
+    const data = await $fetch<{ message?: string; Message?: string }>(
+      apiUrl("/api/account/resend-email-confirmation"),
+      { method: "POST", body: { email } }
+    );
+    resendNotice.value =
+      data.message || data.Message || "If that email is registered and unconfirmed, a new link is on its way.";
+  } catch (err: any) {
+    resendError.value = err.message || "Could not resend the confirmation email.";
+  } finally {
+    isResending.value = false;
+  }
+}
+
 async function onGuestLogin() {
   try {
     isLoading.value = true;
@@ -82,12 +116,12 @@ async function onGuestLogin() {
 <template>
   <div class="space-y-6">
     <form
-      class="p-6 space-y-5 bg-white border rounded-lg border-stone-200 dark:bg-stone-900 dark:border-stone-800 sm:p-8"
+      class="p-6 space-y-5 bg-white border rounded-lg border-stone-200 sm:p-8"
       @submit.prevent="onSubmitRegisterInfo"
     >
       <div class="space-y-2">
         <label
-          class="text-sm font-medium text-stone-700 dark:text-stone-300"
+          class="text-sm font-medium text-stone-700"
           for="username"
         >
           Username
@@ -106,7 +140,7 @@ async function onGuestLogin() {
 
       <div class="space-y-2">
         <label
-          class="text-sm font-medium text-stone-700 dark:text-stone-300"
+          class="text-sm font-medium text-stone-700"
           for="email"
         >
           Email
@@ -125,7 +159,7 @@ async function onGuestLogin() {
 
       <div class="space-y-2">
         <label
-          class="text-sm font-medium text-stone-700 dark:text-stone-300"
+          class="text-sm font-medium text-stone-700"
           for="password"
         >
           Password
@@ -139,6 +173,7 @@ async function onGuestLogin() {
             :type="isPasswordHidden ? 'password' : 'text'"
             required
             :class="inputClass"
+            minlength="8"
             placeholder="••••••••"
           />
           <button
@@ -151,11 +186,15 @@ async function onGuestLogin() {
             <EyeIconSlash v-else />
           </button>
         </div>
+        <p class="text-sm text-stone-500">
+          At least 8 characters, with uppercase, lowercase, a number, and a
+          symbol.
+        </p>
       </div>
 
       <div class="space-y-2">
         <label
-          class="text-sm font-medium text-stone-700 dark:text-stone-300"
+          class="text-sm font-medium text-stone-700"
           for="confirmPassword"
         >
           Confirm password
@@ -168,6 +207,7 @@ async function onGuestLogin() {
             name="confirmPassword"
             :type="isPasswordHidden ? 'password' : 'text'"
             required
+            minlength="8"
             :class="inputClass"
             placeholder="••••••••"
           />
@@ -185,7 +225,7 @@ async function onGuestLogin() {
 
       <div
         v-if="errorMessage"
-        class="p-3 text-sm text-red-700 bg-red-50 border border-red-200 rounded-md dark:text-red-300 dark:bg-red-950 dark:border-red-900"
+        class="p-3 text-sm text-red-700 bg-red-50 border border-red-200 rounded-md"
         role="alert"
       >
         {{ errorMessage }}
@@ -199,7 +239,7 @@ async function onGuestLogin() {
         {{ isLoading ? "Creating account..." : "Create account" }}
       </button>
 
-      <p class="text-sm text-center text-stone-600 dark:text-stone-400">
+      <p class="text-sm text-center text-stone-600">
         Already have an account?
         <NuxtLink
           to="/login"
@@ -210,19 +250,52 @@ async function onGuestLogin() {
       </p>
     </form>
 
-    <div
-      class="p-6 space-y-4 bg-white border rounded-lg border-stone-200 dark:bg-stone-900 dark:border-stone-800 sm:p-8"
+    <form
+      class="p-6 space-y-4 bg-white border rounded-lg border-stone-200 sm:p-8"
+      @submit.prevent="resendConfirmation"
     >
-      <h2 class="text-base font-semibold text-stone-900 dark:text-stone-100">
+      <h2 class="text-base font-semibold text-stone-900">
+        Resend confirmation email
+      </h2>
+      <p class="text-sm text-stone-600">
+        Already registered but never got the link? Enter that email and we will send it again.
+      </p>
+      <label class="block space-y-2 text-sm font-medium text-stone-700" for="resendEmail">
+        Email
+        <input
+          id="resendEmail"
+          v-model="resendEmail"
+          :disabled="isResending"
+          type="email"
+          required
+          :class="inputClass"
+          placeholder="email@example.com"
+        />
+      </label>
+      <p v-if="resendNotice" class="text-sm text-stone-700" role="status">{{ resendNotice }}</p>
+      <p v-if="resendError" class="text-sm text-red-700" role="alert">{{ resendError }}</p>
+      <button
+        type="submit"
+        :disabled="isResending"
+        class="w-full px-5 py-2.5 text-sm font-medium transition-colors rounded-md border border-brand-600 text-brand-600 hover:bg-brand-600 hover:text-white disabled:cursor-not-allowed disabled:opacity-60 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-600"
+      >
+        {{ isResending ? "Sending…" : "Resend confirmation email" }}
+      </button>
+    </form>
+
+    <div
+      class="p-6 space-y-4 bg-white border rounded-lg border-stone-200 sm:p-8"
+    >
+      <h2 class="text-base font-semibold text-stone-900">
         Continue as a guest
       </h2>
-      <p class="text-sm text-stone-600 dark:text-stone-400">
+      <p class="text-sm text-stone-600">
         Browse recipes without an account. Some features require signing in.
       </p>
       <button
         type="button"
         :disabled="isLoading"
-        class="w-full px-5 py-2.5 text-sm font-medium transition-colors rounded-md border border-brand-600 text-brand-600 hover:bg-brand-600 hover:text-white dark:border-brand-500 dark:text-brand-400 dark:hover:bg-brand-600 dark:hover:text-white disabled:cursor-not-allowed disabled:opacity-60 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-600"
+        class="w-full px-5 py-2.5 text-sm font-medium transition-colors rounded-md border border-brand-600 text-brand-600 hover:bg-brand-600 hover:text-white disabled:cursor-not-allowed disabled:opacity-60 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-600"
         @click="onGuestLogin"
       >
         {{ isLoading ? "Logging in..." : "Continue as guest" }}

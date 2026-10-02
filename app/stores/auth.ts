@@ -90,14 +90,14 @@ export const useAuthStore = defineStore("auth", () => {
   }
 
   async function autoLogin(
-    userData: { token: string; username: string; email: string; role: string },
+    userData: { token: string; username: string; email: string; role?: string },
     redirectTo?: string
   ) {
     token.value = userData.token;
     user.value = {
       username: userData.username,
       email: userData.email,
-      role: userData.role,
+      role: userData.role || "User",
     };
     isAuthenticated.value = true;
 
@@ -106,6 +106,14 @@ export const useAuthStore = defineStore("auth", () => {
       localStorage.setItem("authToken", token.value);
     }
     await navigateTo(redirectTo ?? "/");
+  }
+
+  function updateUser(partial: Partial<AuthUser>) {
+    if (!user.value) return;
+    user.value = { ...user.value, ...partial };
+    if (import.meta.client) {
+      localStorage.setItem("authUser", JSON.stringify(user.value));
+    }
   }
 
   function clearAuth() {
@@ -143,19 +151,9 @@ export const useAuthStore = defineStore("auth", () => {
       const emailParam = encodeURIComponent(payload.email);
       navigateTo(`${redirectUrl}?email=${emailParam}`);
     } catch (err: any) {
-      let errorMessage = "";
-      if (Array.isArray(err.data)) {
-        errorMessage = err.data
-          .map((e: any) => e.description || e.message)
-          .join(" ");
-      } else if (err.data?.message) {
-        errorMessage = err.data.message;
-      } else if (err.data?.description) {
-        errorMessage = err.data.description;
-      } else {
-        errorMessage = err.message || "Registration failed.";
-      }
-      throw new Error(errorMessage);
+      throw new Error(
+        apiErrorMessage(err, "[POST] \"/api/account/register\": 400 Bad Request")
+      );
     }
   }
 
@@ -198,6 +196,7 @@ export const useAuthStore = defineStore("auth", () => {
     authSyncCrossTab,
     login,
     autoLogin,
+    updateUser,
     clearAuth,
     logout,
     register,

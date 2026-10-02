@@ -14,7 +14,7 @@ const errorMessage = ref("");
 const isPasswordHidden = ref(true);
 
 const inputClass =
-  "w-full px-4 py-2.5 text-base border rounded-md border-stone-300 bg-white text-stone-900 placeholder:text-stone-400 focus:outline-none focus:border-brand-500 focus:ring-2 focus:ring-brand-500/20 disabled:opacity-60 dark:border-stone-600 dark:bg-stone-950 dark:text-stone-100 dark:placeholder:text-stone-500";
+  "w-full px-4 py-2.5 text-base border rounded-md border-stone-300 bg-white text-stone-900 placeholder:text-stone-400 focus:outline-none focus:border-brand-500 focus:ring-2 focus:ring-brand-500/20 disabled:opacity-60";
 
 async function onSubmitLoginForm() {
   try {
@@ -65,13 +65,13 @@ async function onGuestLogin() {
 <template>
   <div class="space-y-6">
     <form
-      class="p-6 space-y-5 bg-white border rounded-lg border-stone-200 dark:bg-stone-900 dark:border-stone-800 sm:p-8"
+      class="p-6 space-y-5 bg-white border rounded-lg border-stone-200 sm:p-8"
       @submit.prevent="onSubmitLoginForm"
     >
       <div class="space-y-2">
         <div class="flex items-center justify-between">
           <label
-            class="text-sm font-medium text-stone-700 dark:text-stone-300"
+            class="text-sm font-medium text-stone-700"
             for="username"
           >
             Username
@@ -98,7 +98,7 @@ async function onGuestLogin() {
       <div class="space-y-2">
         <div class="flex items-center justify-between">
           <label
-            class="text-sm font-medium text-stone-700 dark:text-stone-300"
+            class="text-sm font-medium text-stone-700"
             for="password"
           >
             Password
@@ -135,7 +135,7 @@ async function onGuestLogin() {
 
       <div
         v-if="errorMessage"
-        class="p-3 text-sm text-red-700 bg-red-50 border border-red-200 rounded-md dark:text-red-300 dark:bg-red-950 dark:border-red-900"
+        class="p-3 text-sm text-red-700 bg-red-50 border border-red-200 rounded-md"
         role="alert"
       >
         {{ errorMessage }}
@@ -149,7 +149,7 @@ async function onGuestLogin() {
         {{ isLoading ? "Logging in..." : "Sign in" }}
       </button>
 
-      <p class="text-sm text-center text-stone-600 dark:text-stone-400">
+      <p class="text-sm text-center text-stone-600">
         Need an account?
         <NuxtLink
           to="/register"
@@ -161,18 +161,18 @@ async function onGuestLogin() {
     </form>
 
     <div
-      class="p-6 space-y-4 bg-white border rounded-lg border-stone-200 dark:bg-stone-900 dark:border-stone-800 sm:p-8"
+      class="p-6 space-y-4 bg-white border rounded-lg border-stone-200 sm:p-8"
     >
-      <h2 class="text-base font-semibold text-stone-900 dark:text-stone-100">
+      <h2 class="text-base font-semibold text-stone-900">
         Continue as a guest
       </h2>
-      <p class="text-sm text-stone-600 dark:text-stone-400">
+      <p class="text-sm text-stone-600">
         Browse recipes without an account. Some features require signing in.
       </p>
       <button
         type="button"
         :disabled="isLoading"
-        class="w-full px-5 py-2.5 text-sm font-medium transition-colors rounded-md border border-brand-600 text-brand-600 hover:bg-brand-600 hover:text-white dark:border-brand-500 dark:text-brand-400 dark:hover:bg-brand-600 dark:hover:text-white disabled:cursor-not-allowed disabled:opacity-60 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-600"
+        class="w-full px-5 py-2.5 text-sm font-medium transition-colors rounded-md border border-brand-600 text-brand-600 hover:bg-brand-600 hover:text-white disabled:cursor-not-allowed disabled:opacity-60 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-600"
         @click="onGuestLogin"
       >
         {{ isLoading ? "Logging in..." : "Continue as guest" }}

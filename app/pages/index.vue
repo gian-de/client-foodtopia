@@ -52,15 +52,15 @@ function onPopularSelect(term: string) {
 <template>
   <div class="px-6 py-10 space-y-12">
     <section
-      class="grid gap-10 p-6 bg-white border rounded-lg border-stone-200 dark:bg-stone-900 dark:border-stone-800 sm:p-8 lg:grid-cols-[1.2fr_0.8fr] lg:items-start"
+      class="grid gap-10 p-6 bg-white border rounded-lg border-stone-200 sm:p-8 lg:grid-cols-[1.2fr_0.8fr] lg:items-start"
     >
       <div class="space-y-5">
         <h1
-          class="text-2xl font-bold text-stone-900 sm:text-3xl dark:text-stone-100"
+          class="text-2xl font-bold text-stone-900 sm:text-3xl"
         >
           What would you like to cook?
         </h1>
-        <p class="text-stone-600 dark:text-stone-400">
+        <p class="text-stone-600">
           Search by recipe name or country of origin.
         </p>
         <RecipeSearchBar v-model="searchQuery" @submit="onSearch" />
@@ -73,24 +73,24 @@ function onPopularSelect(term: string) {
 
     <section class="space-y-6">
       <h2
-        class="text-2xl font-bold text-stone-900 sm:text-3xl dark:text-stone-100"
+        class="text-2xl font-bold text-stone-900 sm:text-3xl"
       >
         Most liked recipes
       </h2>
 
       <div
         v-if="errorMessage"
-        class="p-3 text-red-700 bg-red-50 border border-red-200 rounded-md dark:text-red-300 dark:bg-red-950 dark:border-red-900"
+        class="p-3 text-red-700 bg-red-50 border border-red-200 rounded-md"
         role="alert"
       >
         {{ errorMessage }}
       </div>
 
-      <p v-else-if="isLoading" class="text-stone-600 dark:text-stone-400">
+      <p v-else-if="isLoading" class="text-stone-600">
         Loading recipes...
       </p>
 
-      <p v-else-if="!recipes?.length" class="text-stone-600 dark:text-stone-400">
+      <p v-else-if="!recipes?.length" class="text-stone-600">
         No recipes to show yet.
       </p>
 

@@ -15,6 +15,7 @@ export function useApiBase() {
 
   // In dev, call same-origin `/api/*`. Nitro proxies that to localhost:5001.
   const apiBase = import.meta.dev ? "" : externalBase;
+  const assetBase = import.meta.dev ? "" : externalBase;
 
   function apiUrl(path: string) {
     const normalized = path.startsWith("/") ? path : `/${path}`;
@@ -23,7 +24,7 @@ export function useApiBase() {
 
   return {
     apiBase,
-    assetBase: externalBase,
+    assetBase,
     apiUrl,
   };
 }
