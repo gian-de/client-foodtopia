@@ -32,7 +32,7 @@ export function apiErrorMessage(err: unknown, fallback: string) {
     statusMessage?: string;
   };
 
-  const data = fetchErr.data;
+  const data = fetchErr.data ?? (fetchErr as { response?: { _data?: unknown } }).response?._data;
   if (typeof data === "string" && data.trim()) return data;
 
   if (data && typeof data === "object") {
@@ -51,4 +51,10 @@ export function apiErrorMessage(err: unknown, fallback: string) {
 
   if (raw && !isGenericStatus) return raw;
   return fallback;
+}
+
+export function serverErrorMessage(err: unknown) {
+  const status = (err as { status?: number }).status ?? 0;
+  if (status < 500) return "";
+  return err instanceof Error ? err.message : "Something went wrong. Try again.";
 }

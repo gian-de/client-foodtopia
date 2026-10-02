@@ -14,11 +14,7 @@ export const useAuthMethods = () => {
       });
       return { success: true, message: data.message };
     } catch (err: any) {
-      const errorMessage =
-        err.data?.message ||
-        err.message ||
-        "Failed to send the email reminder.";
-      throw new Error(errorMessage);
+      throw new Error(apiErrorMessage(err, "Failed to send the email reminder."));
     }
   }
 
@@ -35,11 +31,7 @@ export const useAuthMethods = () => {
       });
       return { success: true, message: data.message };
     } catch (err: any) {
-      const errorMessage =
-        err.data?.message ||
-        err.message ||
-        "Failed to send the email reminder.";
-      throw new Error(errorMessage);
+      throw new Error(apiErrorMessage(err, "Failed to send the email reminder."));
     }
   }
 
