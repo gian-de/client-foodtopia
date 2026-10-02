@@ -35,5 +35,7 @@ async function resolveBackendBase() {
 
 export async function proxyToBackend(event: H3Event) {
   const base = await resolveBackendBase();
-  return proxyRequest(event, `${base}${event.path}`);
+  return proxyRequest(event, `${base}${event.path}`, {
+    fetchOptions: { signal: AbortSignal.timeout(25_000) },
+  });
 }
