@@ -34,14 +34,14 @@ function onSubmit() {
   <form class="w-full" @submit.prevent="onSubmit">
     <label class="sr-only" for="recipe-search">Search recipes</label>
     <div
-      class="flex overflow-hidden border rounded-md border-stone-300 bg-white dark:border-stone-600 dark:bg-stone-900 focus-within:border-brand-500 focus-within:ring-2 focus-within:ring-brand-500/20"
+      class="flex overflow-hidden border rounded-md border-stone-300 bg-white focus-within:border-brand-500 focus-within:ring-2 focus-within:ring-brand-500/20"
     >
       <input
         id="recipe-search"
         :value="modelValue"
         type="search"
         :placeholder="placeholders[placeholderIndex]"
-        class="flex-1 min-w-0 px-4 py-3 text-base text-stone-900 placeholder:text-stone-400 bg-transparent dark:text-stone-100 dark:placeholder:text-stone-500 focus:outline-none sm:py-3.5 sm:text-lg"
+        class="flex-1 min-w-0 px-4 py-3 text-base text-stone-900 placeholder:text-stone-400 bg-transparent focus:outline-none sm:py-3.5 sm:text-lg"
         @input="
           emit('update:modelValue', ($event.target as HTMLInputElement).value)
         "
