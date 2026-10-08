@@ -5,15 +5,12 @@ export const useAuthMethods = () => {
     const url = apiUrl("/api/account/forgot-username");
 
     try {
-      const data = await $fetch<{ message: string }>(url, {
+      const data = await $fetch<{ message?: string; Message?: string }>(url, {
         method: "POST",
         body: { email },
-        headers: {
-          "Content-Type": "application/json",
-        },
       });
-      return { success: true, message: data.message };
-    } catch (err: any) {
+      return { success: true, message: data.message || data.Message || "If an account with this email exists, the username has been sent." };
+    } catch (err: unknown) {
       throw new Error(apiErrorMessage(err, "Failed to send the email reminder."));
     }
   }
@@ -22,14 +19,11 @@ export const useAuthMethods = () => {
     const url = apiUrl("/api/account/forgot-password");
 
     try {
-      const data = await $fetch<{ message: string }>(url, {
+      const data = await $fetch<{ message?: string; Message?: string }>(url, {
         method: "POST",
         body: { email },
-        headers: {
-          "Content-Type": "application/json",
-        },
       });
-      return { success: true, message: data.message };
+      return { success: true, message: data.message || data.Message || "If an account with this email exists, a password reset link has been sent." };
     } catch (err: any) {
       throw new Error(apiErrorMessage(err, "Failed to send the email reminder."));
     }
